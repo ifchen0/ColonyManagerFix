@@ -1,0 +1,17 @@
+Unofficial performance fix for [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3262932412]Colony Manager Fork[/url].
+
+[h2]A constant cost of about 1 ms every tick[/h2]As soon as an AI manager is built and powered, Dubs Performance Analyzer shows:
+[code]FluffyManager.Building_AIManager DoTick[/code]
+at about 1.1 ms per call, once per tick. At 3x speed the whole tick budget is under 3 ms, so this alone eats a large part of it.
+
+[b]Cause:[/b] On every tick the AI manager asks the game for the list of free colonists on its map ([i]MapPawns.FreeColonists[/i]). That list includes colonists that are not spawned, so the game walks through every container on the map to find them: every shelf, bed, grave and pawn inventory. The AI manager only needs a colonist on its work ticks (every 250 ticks); on all other ticks it just checks that the list is not empty to keep its lights blinking.
+
+[b]Fix:[/b] The list is rebuilt on every work tick, so the AI manager still picks its colonist from a fresh list, and at most once a second otherwise. In between it reuses the last result. In my colony the cost dropped from 1.14 ms to 0.03 ms per tick.
+
+[h2]Notes[/h2][list]
+[*]Safe to add to or remove from an existing save.
+[*]Manager desks run by colonists are not affected; only the AI manager building had this cost.
+[*]Load after Colony Manager Fork.
+[/list]
+[hr][/hr]
+This mod was developed with the help of AI coding tools (Claude Code). Full source code is included in the Source folder for review.

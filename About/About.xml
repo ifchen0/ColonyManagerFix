@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Colony Manager Fork Performance Fix</name>
+  <author>ifchen0</author>
+  <packageId>ifchen0.colonymanagerfix</packageId>
+  <supportedVersions><li>1.6</li></supportedVersions>
+  <description>Unofficial performance fix for Colony Manager Fork.
+
+Symptom: a constant cost of about 1 ms every game tick as soon as an AI manager is built and powered. In Dubs Performance Analyzer it shows up as FluffyManager.Building_AIManager DoTick, at about 1.1 ms per call, once per tick.
+
+Cause: on every tick the AI manager asks the game for the list of free colonists on its map. That list includes colonists that are not spawned, so the game walks through every container on the map to find them - every shelf, bed, grave and pawn inventory. The AI manager only needs a colonist on its work ticks (every 250 ticks); on all other ticks it just checks that the list is not empty to keep its lights blinking.
+
+Fix: the list is rebuilt on every work tick, so the AI manager still picks its colonist from a fresh list, and at most once a second otherwise. In between it reuses the last result. In my colony the cost dropped from 1.14 ms to 0.03 ms per tick.
+
+Notes:
+- Safe to add to or remove from an existing save.
+- Manager desks run by colonists are not affected; only the AI manager building had this cost.
+- Load after Colony Manager Fork.</description>
+  <modDependencies>
+    <li><packageId>brrainz.harmony</packageId><displayName>Harmony</displayName><steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl></li>
+    <li><packageId>Heaven.ColonyManagerFork</packageId><displayName>Colony Manager Fork</displayName><steamWorkshopUrl>steam://url/CommunityFilePage/3262932412</steamWorkshopUrl></li>
+  </modDependencies>
+  <loadAfter>
+    <li>brrainz.harmony</li>
+    <li>Heaven.ColonyManagerFork</li>
+  </loadAfter>
+</ModMetaData>
